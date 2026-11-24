@@ -16,10 +16,9 @@ I had found a chess game writen in python but the ai suck, they taked 30 seconds
 
 # Build
 
-
-
-
-
+- Step 1: Run build.bat on windows
+- Step 2: Wait a bit
+- Step 3:  Find the .exe in `.\OpenSnake\target\release`
 # How To Use
 
 To use it at an ai bot, you jsut need to use the `OpenSnake.exe` in your code

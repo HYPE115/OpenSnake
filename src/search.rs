@@ -68,10 +68,6 @@ impl TranspositionTable {
         })
     }
 
-    fn hit_rate(&self) -> f64 {
-        if self.probes == 0 { 0.0 } else { (self.hits as f64) / (self.probes as f64) * 100.0 }
-    }
-
     fn clear(&mut self) {
         self.table.clear();
         self.probes = 0;
