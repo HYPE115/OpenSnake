@@ -8,10 +8,18 @@ I had found a chess game writen in python but the ai suck, they taked 30 seconds
 
 # Key feature
 
-- Scoring system ---> On a scale to 1 up to 100 (plain number only rn, there no way u get a good scaling system rn)
-- Best moove finder ---> List the good move ig? (use the scoring system, so maybe i need to improve it with decimal number....)
+- Scoring system ---> On a scale to 1 up to 100 but now with decimals (64.532168 type shi) so 2 moves with the same score can still be compared and u actually pick the best one
+- Best moove finder ---> List the good move ig? (now it list the top N moves sorted by their exact score, not just the best one)
 - Writed in Rust ---> Rust is fast so why to not use it? (probably a bad idea but atleast it's fast if the code doesn't break...)
 - Chess ai compatibility ---> Idk how to say that, it's supposed to be an AI chessbot/engine yk. Ima try to be the easier possible to use it in your project for chessbot (don't use it as a cheat you gonna loose elo at this point #_#)
+- UCI protocol ---> The universal standard so Arena, SCID, Cute Chess and any bot can talk to it properly (u send position, it's send move, verry simple yk)
+- ELO selector ---> U can set the bot ELO from 1 to 9999 (low elo = it play like me, high elo = it tryhard but he probably suck too bc i made it)
+- Time management ---> Handle wtime, btime and movetime so it don't lose on time in blitz/rapid (u just told him to speed up, so he not gonna take 1day to play in a 5 mins blitz)
+- Transposition table ---> It remember positions it already calculated instead of recalculating everything (that the ram of the sofware, probably)
+- Alpha-beta + pruning ---> It look at the good moves first and throw away the trash ones (I hope it's work, i'm too lazy to test it, i don't even know how to test that..)
+- FEN support ---> Load and export any position with FEN (for all the weird custom positions u want, try to not break the engine please)
+- Bench command ---> Perft benchmark to see how many nodes/sec it can do (nerd stuff)
+- Build script ---> Just run build.bat and u get a .exe (why did i even explain it?)
 - Other things ig? idk what other things to add rn, ima see later
 
 # Build
