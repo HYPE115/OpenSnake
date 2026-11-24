@@ -1,0 +1,13 @@
+[package]
+name = "opensnake"
+version = "0.1.0"
+edition = "2021"
+description = "OpenSnake - an open source chess engine like stockfish (but worse, use stockfish bro this repo suck tbh)"
+
+[lib]
+name = "opensnake"
+path = "src/lib.rs"
+
+[[bin]]
+name = "OpenSnake"
+path = "src/main.rs"
