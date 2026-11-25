@@ -405,7 +405,9 @@ impl Board {
             }
         }
 
-        self.castling = CastlingRights::default();
+        // On ne touche aux droits de roque que si le roi ou une tour d'origine
+        // bouge (ou est capturée). Les réinitialiser à chaque coup empêchait
+        // tout roque et désynchronisait le moteur des GUI comme Cute Chess.
         if moving.kind == PieceType::King {
             if mover == Color::White {
                 self.castling.white_kingside = false;

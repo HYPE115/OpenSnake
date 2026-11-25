@@ -20,6 +20,11 @@ I had found a chess game writen in python but the ai suck, they taked 30 seconds
 - FEN support ---> Load and export any position with FEN (for all the weird custom positions u want, try to not break the engine please)
 - Bench command ---> Perft benchmark to see how many nodes/sec it can do (nerd stuff)
 - Build script ---> Just run build.bat and u get a .exe (why did i even explain it?)
+- Better eval ---> It's not just "count the pieces" anymore, it also looks at where they stand, pawns, king safety, mobility and all that nerdy shi (still no neural network tho)
+- Move ordering ---> It tries TT moves, captures with SEE, killer moves and history first so it can throw away the trash faster
+- MultiPV / Hash / AnalyseMode ---> U can ask for many lines, set the table size and make it think without a time limit (handy for analysis)
+- Cute Chess ready ---> Full UCI handshake and async `isready` / `stop` / `ucinewgame` (even while it's thinking), so u can just point Cute Chess at the .exe and run games
+- Human timing ---> Low ELO don't play instantly anymore (delay from ELO: 200 ≈ 2,3 s, 1500 ≈ 1 s, 9999 ≈ 0,2 s), configurable in ms with `MoveDelay` + `MoveDelayJitter` for a time range
 - Other things ig? idk what other things to add rn, ima see later
 
 # Build
@@ -38,7 +43,7 @@ The 3 commands u actually need:
 - `go movetime 100` ---> tell it to think max 100 ms (or `go wtime 10000 btime 10000` in a real game)
 - `bestmove g1f3` ---> what it answer, that's the move u play
 
-Optional but cool: `setoption name Elo value 1500` before the `go` if u want it weaker/stronger (1 to 9999).
+Optional but cool: `setoption name Elo value 1500` before the `go` if u want it weaker/stronger (1 to 9999). U can also use `setoption name Hash value 64`, `setoption name MultiPV value 3` or `setoption name UCI_AnalyseMode value true`.
 
 **Exemple:**
 *Python:*
@@ -148,3 +153,35 @@ Some stuff to know so u don't get stuck:
 - Don't send `quit` before reading `bestmove`, otherwise the engine can close before answering
 - The engine answer `bestmove 0000` if there is no legal move (mate/stalemate), so check that in ur bot
 - For a real game, send `go wtime X btime X winc Y binc Y` with the remaining time in ms, the engine handle the rest
+- By default the delay before playing depends on `UCI_Elo` (weak ELO = slower, like a real human). Set `setoption name MoveDelay value 3000` for a fixed 3 s delay, or `setoption name MoveDelayJitter value 1000` to add a random 0–1000 ms range on top. `MoveDelay 0` = back to ELO-based auto
+- The delay can never make you lose on time: it's capped at 40% of the remaining time in a timed game, and `go movetime X` always wins over `MoveDelay`. `go infinite` / analyse mode ignore it (they wait for `stop`)
+
+# Cute Chess
+
+U can add OpenSnake as a normal UCI engine, nothing special to install. Example `engines.json`:
+
+```json
+[
+  {
+    "name": "OpenSnake",
+    "command": "C:\\...\\OpenSnake.exe",
+    "protocol": "uci"
+  }
+]
+```
+
+Then just start a match/tournament from the GUI or CLI (`cutechess-cli -engine cmd=OpenSnake.exe proto=uci -engine cmd=Other.exe proto=uci -each tc=5+0.05`). The engine only answers after `uci`, handles `isready` during search, reacts to `stop`, and sends `bestmove 0000` when there's no legal move. Options exposed: `UCI_Elo` + `UCI_LimitStrength`, `Hash`, `MultiPV`, `UCI_AnalyseMode`, `MoveDelay`, `MoveDelayJitter`.
+
+Self-play against itself, with `baron30.bin` and colors swapped (`-repeat`) so the games don't always start the same way:
+
+```bat
+cutechess-cli -engine cmd="OpenSnake.exe" proto=uci name=OpenSnake-A -engine cmd="OpenSnake.exe" proto=uci name=OpenSnake-B -each tc=5+0.3 book="C:\Program Files (x86)\Cute Chess\baron30.bin" bookdepth=8 -games 2 -rounds 1 -repeat -concurrency 1 -pgnout selfplay_OpenSnake.pgn
+```
+
+To get an Elo ranking from that PGN, use [Ordo](https://github.com/jhaglund/ordo) (not included in this repo):
+
+```bat
+ordo-win64.exe -p selfplay_OpenSnake.pgn -s 1000 -o rating.txt
+```
+
+`-s 1000` adds the statistical error margin. Two instances of the same engine should come out at the same rating (écart ≈ 0), but with only a few games the ± error is huge — play more rounds to narrow it.
